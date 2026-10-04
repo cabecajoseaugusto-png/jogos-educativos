@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogos Educativos 🧠</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', cursive, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; font-size: 2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.3s; }
+        .card:hover { transform: scale(1.03); }
+        .card h2 { color: #667eea; margin-bottom: 10px; }
+        .card p { color: #666; }
+        .pontos { background: #ffd700; color: #333; padding: 15px; border-radius: 15px; text-align: center; font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; }
+        .jogo { background: white; border-radius: 20px; padding: 25px; display: none; }
+        .jogo.ativo { display: block; }
+        .pergunta { font-size: 1.5rem; text-align: center; margin: 20px 0; color: #333; font-weight: bold; }
+        .opcao { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .opcao:hover { background: #667eea; color: white; }
+        .correta { background: #4CAF50; color: white; }
+        .errada { background: #f44336; color: white; }
+        .botao { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1rem; cursor: pointer; margin-top: 20px; width: 100%; }
+        .botao:hover { background: #5568d3; }
+        .voltar { background: #ddd; color: #333; margin-bottom: 15px; }
+        .acerto { text-align: center; font-size: 1.3rem; color: #4CAF50; font-weight: bold; margin: 15px 0; }
+        .erro { text-align: center; font-size: 1.3rem; color: #f44336; font-weight: bold; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Jogos Educativos</h1>
+        
+        <div class="pontos">⭐ Suas Estrelas: <span id="estrelas">0</span></div>
+
+        <!-- Tela Inicial -->
+        <div id="inicio">
+            <div class="card" onclick="abrirJogo('matematica')">
+                <h2>🔢 Matemática Divertida</h2>
+                <p>Soma, subtração e muito mais!</p>
+            </div>
+            <div class="card" onclick="abrirJogo('letras')">
+                <h2>🔤 Descobrindo as Letras</h2>
+                <p>Complete as palavras!</p>
+            </div>
+            <div class="card" onclick="abrirJogo('cores')">
+                <h2>🎨 Cores e Formas</h2>
+                <p>Qual é a cor certa?</p>
+            </div>
+            <div class="card" onclick="abrirJogo('quiz')">
+                <h2>🧠 Quiz do Saber</h2>
+                <p>Perguntas legais sobre tudo!</p>
+            </div>
+        </div>
+
+        <!-- Jogo Matemática -->
+        <div id="matematica" class="jogo">
+            <button class="botao voltar" onclick="voltar()">← Voltar</button>
+            <h2 style="text-align:center; color:#667eea">🔢 Matemática</h2>
+            <div class="pergunta" id="pergMat"></div>
+            <div id="opcoesMat"></div>
+            <div id="resultMat"></div>
+            <button class="botao" id="proxMat" style="display:none" onclick="novaMatematica()">Próxima Pergunta →</button>
+        </div>
+
+        <!-- Jogo Letras -->
+        <div id="letras" class="jogo">
+            <button class="botao voltar" onclick="voltar()">← Voltar</button>
+            <h2 style="text-align:center; color:#667eea">🔤 Completando Palavras</h2>
+            <div class="pergunta" id="pergLet"></div>
+            <div id="opcoesLet"></div>
+            <div id="resultLet"></div>
+            <button class="botao" id="proxLet" style="display:none" onclick="novaLetras()">Próxima →</button>
+        </div>
+
+        <!-- Jogo Cores -->
+        <div id="cores" class="jogo">
+            <button class="botao voltar" onclick="voltar()">← Voltar</button>
+            <h2 style="text-align:center; color:#667eea">🎨 Qual é a Cor?</h2>
+            <div class="pergunta" id="pergCor"></div>
+            <div id="opcoesCor"></div>
+            <div id="resultCor"></div>
+            <button class="botao" id="proxCor" style="display:none" onclick="novaCor()">Próxima →</button>
+        </div>
+
+        <!-- Jogo Quiz -->
+        <div id="quiz" class="jogo">
+            <button class="botao voltar" onclick="voltar()">← Voltar</button>
+            <h2 style="text-align:center; color:#667eea">🧠 Quiz</h2>
+            <div class="pergunta" id="pergQuiz"></div>
+            <div id="opcoesQuiz"></div>
+            <div id="resultQuiz"></div>
+            <button class="botao" id="proxQuiz" style="display:none" onclick="novaQuiz()">Próxima →</button>
+        </div>
+    </div>
+
+    <script>
+        let estrelas = 0;
+        let jogoAtual = '';
+
+        function abrirJogo(nome) {
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById(nome).classList.add('ativo');
+            jogoAtual = nome;
+            
+            if(nome === 'matematica') novaMatematica();
+            if(nome === 'letras') novaLetras();
+            if(nome === 'cores') novaCor();
+            if(nome === 'quiz') novaQuiz();
+        }
+
+        function voltar() {
+            document.querySelectorAll('.jogo').forEach(j => j.classList.remove('ativo'));
+            document.getElementById('inicio').style.display = 'block';
+        }
+
+        function adicionarEstrela() {
+            estrelas++;
+            document.getElementById('estrelas').textContent = estrelas;
+        }
+
+        // MATEMÁTICA
+        function novaMatematica() {
+            const a = Math.floor(Math.random()*10)+1;
+            const b = Math.floor(Math.random()*10)+1;
+            const op = Math.random()>0.5 ? '+' : '-';
+            let res;
+            if(op === '+') res = a + b;
+            else { res = a - b; if(res < 0) { res = b - a; [a, b] = [b, a]; } }
+            
+            document.getElementById('pergMat').textContent = `${a} ${op} ${b} = ?`;
+            const erradas = [res+1, res-1, res+2].filter(n => n >= 0 && n !== res);
+            const ops = [res, ...erradas.slice(0,3)].sort(() => Math.random()-0.5);
+            
+            document.getElementById('opcoesMat').innerHTML = ops.map(o => 
+                `<div class="opcao" onclick="verificarMat(${o}, ${res}, this)">${o}</div>`
+            ).join('');
+            document.getElementById('resultMat').innerHTML = '';
+            document.getElementById('proxMat').style.display = 'none';
+        }
+        function verificarMat(resp, certa, el) {
+            document.querySelectorAll('#opcoesMat .opcao').forEach(o => o.style.pointerEvents = 'none');
+            if(resp === certa) { el.classList.add('correta'); document.getElementById('resultMat').innerHTML = '<div class="acerto">🎉 Parabéns!</div>'; adicionarEstrela(); }
+            else { el.classList.add('errada'); document.getElementById('resultMat').innerHTML = `<div class="erro">❌ O certo é ${certa}</div>`; }
+            document.getElementById('proxMat').style.display = 'block';
+        }
+
+        // LETRAS
+        const palavras = [
+            {p:'CASA', l:'S', d:'Lugar onde moramos!'},
+            {p:'GATO', l:'T', d:'Animal que mia!'},
+            {p:'SOL', l:'L', d:'Brilha no céu de dia!'},
+            {p:'BOLO', l:'L', d:'Comida doce de festa!'},
+            {p:'FLOR', l:'O', d:'Bela e tem perfume!'},
+            {p:'AGUA', l:'U', d:'Bebemos e não tem cor!'},
+        ];
+        function novaLetras() {
+            const p = palavras[Math.floor(Math.random()*palavras.length)];
+            const pos = p.p.indexOf(p.l);
+            const mostrada = p.p.substring(0, pos) + '_' + p.p.substring(pos+1);
+            const letras = ['A','E','I','O','U', p.l].sort(() => Math.random()-0.5);
+            
+            document.getElementById('pergLet').innerHTML = `${p.d}<br><br>${mostrada}`;
+            document.getElementById('opcoesLet').innerHTML = letras.map(l => 
+                `<div class="opcao" onclick="verificarLet('${l}', '${p.l}', this)">${l}</div>`
+            ).join('');
+            document.getElementById('resultLet').innerHTML = '';
+            document.getElementById('proxLet').style.display = 'none';
+        }
+        function verificarLet(resp, certa, el) {
+            document.querySelectorAll('#opcoesLet .opcao').forEach(o => o.style.pointerEvents = 'none');
+            if(resp === certa) { el.classList.add('correta'); document.getElementById('resultLet').innerHTML = '<div class="acerto">🎉 Muito bem!</div>'; adicionarEstrela(); }
+            else { el.classList.add('errada'); document.getElementById('resultLet').innerHTML = `<div class="erro">❌ É a letra ${certa}</div>`; }
+            document.getElementById('proxLet').style.display = 'block';
+        }
+
+        // CORES
+        const cores = [
+            {n:'Vermelho', c:'#e74c3c'},
+            {n:'Azul', c:'#3498db'},
+            {n:'Verde', c:'#2ecc71'},
+            {n:'Amarelo', c:'#f1c40f'},
+            {n:'Roxo', c:'#9b59b6'},
+            {n:'Laranja', c:'#e67e22'},
+        ];
+        function novaCor() {
+            const certa = cores[Math.floor(Math.random()*cores.length)];
+            const ops = cores.filter(c => c.n !== certa.n).slice(0,3);
+            ops.push(certa); ops.sort(() => Math.random()-0.5);
+            
+            document.getElementById('pergCor').innerHTML = `<div style="width:100px;height:100px;background:${certa.c};margin:0 auto;border-radius:15px"></div>`;
+            document.getElementById('opcoesCor').innerHTML = ops.map(o => 
+                `<div class="opcao" onclick="verificarCor('${o.n}', '${certa.n}', this)">${o.n}</div>`
+            ).join('');
+            document.getElementById('resultCor').innerHTML = '';
+            document.getElementById('proxCor').style.display = 'none';
+        }
+        function verificarCor(resp, certa, el) {
+            document.querySelectorAll('#opcoesCor .opcao').forEach(o => o.style.pointerEvents = 'none');
+            if(resp === certa) { el.classList.add('correta'); document.getElementById('resultCor').innerHTML = '<div class="acerto">🎉 Acertou!</div>'; adicionarEstrela(); }
+            else { el.classList.add('errada'); document.getElementById('resultCor').innerHTML = `<div class="erro">❌ É ${certa}</div>`; }
+            document.getElementById('proxCor').style.display = 'block';
+        }
+
+        // QUIZ
+        const perguntas = [
+            {p:'Quantos dias tem uma semana?', r:'7', o:['5','6','7','8']},
+            {p:'Qual planeta é mais quente?', r:'Vênus', o:['Marte','Vênus','Terra','Júpiter']},
+            {p:'Quantas patas tem um cachorro?', r:'4', o:['2','3','4','5']},
+            {p:'Qual é a capital do Brasil?', r:'Brasília', o:['São Paulo','Rio','Brasília','Salvador']},
+            {p:'O que a planta precisa para crescer?', r:'Sol', o:['Refrigerante','Sol','Doce','Fogo']},
+            {p:'Quantas horas tem um dia?', r:'24', o:['12','24','36','48']},
+        ];
+        function novaQuiz() {
+            const q = perguntas[Math.floor(Math.random()*perguntas.length)];
+            document.getElementById('pergQuiz').textContent = q.p;
+            const ops = [...q.o].sort(() => Math.random()-0.5);
+            document.getElementById('opcoesQuiz').innerHTML = ops.map(o => 
+                `<div class="opcao" onclick="verificarQuiz('${o}', '${q.r}', this)">${o}</div>`
+            ).join('');
+            document.getElementById('resultQuiz').innerHTML = '';
+            document.getElementById('proxQuiz').style.display = 'none';
+        }
+        function verificarQuiz(resp, certa, el) {
+            document.querySelectorAll('#opcoesQuiz .opcao').forEach(o => o.style.pointerEvents = 'none');
+            if(resp === certa) { el.classList.add('correta'); document.getElementById('resultQuiz').innerHTML = '<div class="acerto">🎉 Boa!</div>'; adicionarEstrela(); }
+            else { el.classList.add('errada'); document.getElementById('resultQuiz').innerHTML = `<div class="erro">❌ O certo é ${certa}</div>`; }
+            document.getElementById('proxQuiz').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
